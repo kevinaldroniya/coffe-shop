@@ -1,4 +1,5 @@
 import model.MenuItem;
+import model.Order;
 
 import java.util.*;
 
@@ -13,7 +14,7 @@ public class Main {
         return listMenu;
     }
 
-    public static double createOrder(List<MenuItem> listMenu, Scanner scanner) {
+    public static double createOrder(List<MenuItem> listMenu, Scanner scanner, List<Order> listOrder) {
         double totalBill = 0.0;
         while (true) {
             // by adding try-catch block we're already preparing for mismatch input
@@ -31,6 +32,7 @@ public class Main {
                     }
                     MenuItem chosenItem = listMenu.get(chosen-1);
                     totalBill += chosenItem.getPrice()*amount;
+                    listOrder.add(new Order(chosenItem, amount));
                     System.out.printf("Your order is %s with price : %.2f x %d = %.2f \n", chosenItem.getName(), chosenItem.getPrice(), amount, chosenItem.getPrice()*amount);
                 } else {
                     System.out.println("Invalid menu number");
@@ -60,9 +62,10 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
+        List<Order> listOrder = new ArrayList<>();
         List<MenuItem> listMenu = initiateMenu();
         printMenu(listMenu);
-        double totalPrice = createOrder(listMenu, scanner);
+        double totalPrice = createOrder(listMenu, scanner, listOrder);
         System.out.printf("Your bill total is - Rp %.2f \n", totalPrice);
         double discount = 0.0;
         if (totalPrice >= 50000.0) {
@@ -70,9 +73,17 @@ public class Main {
         }
         System.out.printf("Total discount(10%%): %.2f \n", discount);
 
+        printInvoice(listOrder);
         System.out.printf("Your final bill total is %.2f - %.2f = Rp %.2f \n", totalPrice, discount, (totalPrice - discount));
 
-
         scanner.close();
+    }
+
+    private static void printInvoice(List<Order> listOrder) {
+        System.out.println("===============================================================");
+        System.out.println("This is your invoice");
+        for (Order order: listOrder) {
+            System.out.printf("%s - %d \n", order.getMenuItem().getName(), order.getQuantity());
+        }
     }
 }
